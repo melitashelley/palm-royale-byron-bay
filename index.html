@@ -51,16 +51,19 @@
 
   const frame = document.createElement('iframe');
   frame.src = APP_URL;
-  frame.title = 'The Palm Royale Styling Draw';
-  frame.allow = 'clipboard-write';
+  frame.title = 'The Palm Royale styling draw';
+  frame.allow = 'clipboard-write; web-share';
   frame.setAttribute('scrolling', 'no');
   mount.appendChild(frame);
 
   // The app inside tells us how tall it is, so there's no nested scrollbar
   // and nothing gets clipped on iOS.
   window.addEventListener('message', function (e) {
-    const h = e.data && e.data.palmRoyaleHeight;
+    if (!e.data) return;
+    const h = e.data.palmRoyaleHeight;
     if (typeof h === 'number' && h > 200) frame.style.height = h + 'px';
+    // the frame can't scroll itself, so it asks us to go back to the top
+    if (e.data.palmRoyaleScrollTop) window.scrollTo({top: 0, behavior: 'smooth'});
   });
 })();
 </script>
