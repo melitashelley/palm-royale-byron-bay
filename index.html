@@ -1,82 +1,41 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Palm Royale — Byron Bay 2026</title>
 <meta name="theme-color" content="#FCEEE1">
 <meta name="description" content="The stylists' draw. Byron Bay Girls Weekend 2026.">
 
-<!-- ============================================================
-     PASTE YOUR /exec URL BETWEEN THE QUOTES ON THE NEXT LINE.
-     Spreadsheet → Palm Royale → Show web app link.
-     ============================================================ -->
+<!-- The web app this frames. Spreadsheet -> Palm Royale -> Show web app link. -->
 <script>
   const APP_URL = "https://script.google.com/macros/s/AKfycbyzhdot8C9RJmrwFLoheKMzvRaq117CIFq9wP9DnnjN_87PY_9jOUqhmSIEzobaNfCk/exec";
 </script>
 
 <style>
-  html, body { margin: 0; padding: 0; background: #FCEEE1; }
-  body {
-    background:
-      radial-gradient(circle at 12% 6%, #FFE3EC 0%, transparent 42%),
-      radial-gradient(circle at 88% 3%, #DCF0EA 0%, transparent 38%),
-      #FCEEE1;
-    min-height: 100vh;
-    min-height: 100dvh;
+  /* The frame is exactly the size of the screen and does its own scrolling.
+     This page never scrolls, so it can't end up stranded halfway down. */
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    background: #FCEEE1; overscroll-behavior: none;
   }
-  iframe { display: block; width: 100%; border: 0; min-height: 100vh; }
-  #setup {
-    max-width: 560px; margin: 15vh auto; padding: 26px 28px;
-    background: #FBE4E9; border: 1.5px solid #E54C78; border-radius: 4px;
-    font: 400 15px/1.65 "Jost", "Avenir Next", system-ui, sans-serif; color: #4A3128;
+  #frame {
+    display: block; border: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
   }
-  #setup b { display: block; margin-bottom: 8px; font-weight: 500; color: #C9316A;
-             letter-spacing: .14em; text-transform: uppercase; font-size: 12px; }
-  #setup code { background: #fff; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
 </style>
 
 <div id="mount"></div>
 
 <script>
 (function () {
-  const mount = document.getElementById('mount');
-
-  if (!APP_URL || APP_URL.indexOf('PASTE_') === 0) {
-    mount.innerHTML =
-      '<div id="setup"><b>Almost there</b>Open this file in a text editor and replace ' +
-      '<code>PASTE_YOUR_EXEC_URL_HERE</code> with your web app link, then upload it again. ' +
-      'You can find the link in the spreadsheet under Palm Royale → Show web app link.</div>';
-    return;
-  }
-
   const frame = document.createElement('iframe');
+  frame.id = 'frame';
   frame.src = APP_URL;
   frame.title = 'The Palm Royale styling draw';
   frame.allow = 'clipboard-write; web-share';
-  frame.setAttribute('scrolling', 'no');
-  mount.appendChild(frame);
-
-  // The app inside tells us how tall it is, so there's no nested scrollbar
-  // and nothing gets clipped on iOS.
-  let askedAt = 0;
-
-  window.addEventListener('message', function (e) {
-    if (!e.data) return;
-
-    const h = e.data.palmRoyaleHeight;
-    if (typeof h === 'number' && h > 200) {
-      frame.style.height = h + 'px';
-      // a resize just after a scroll request can strand the page mid-way
-      if (Date.now() - askedAt < 1500) window.scrollTo(0, 0);
-    }
-
-    // the frame can't scroll itself, so it asks us to go back to the top
-    if (e.data.palmRoyaleScrollTop) {
-      askedAt = Date.now();
-      window.scrollTo(0, 0);
-      [60, 200, 450, 800].forEach(function (t) { setTimeout(function () { window.scrollTo(0, 0); }, t); });
-    }
-  });
+  document.getElementById('mount').appendChild(frame);
 })();
 </script>
 </html>
