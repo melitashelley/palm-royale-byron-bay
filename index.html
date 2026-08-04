@@ -58,12 +58,24 @@
 
   // The app inside tells us how tall it is, so there's no nested scrollbar
   // and nothing gets clipped on iOS.
+  let askedAt = 0;
+
   window.addEventListener('message', function (e) {
     if (!e.data) return;
+
     const h = e.data.palmRoyaleHeight;
-    if (typeof h === 'number' && h > 200) frame.style.height = h + 'px';
+    if (typeof h === 'number' && h > 200) {
+      frame.style.height = h + 'px';
+      // a resize just after a scroll request can strand the page mid-way
+      if (Date.now() - askedAt < 1500) window.scrollTo(0, 0);
+    }
+
     // the frame can't scroll itself, so it asks us to go back to the top
-    if (e.data.palmRoyaleScrollTop) window.scrollTo({top: 0, behavior: 'smooth'});
+    if (e.data.palmRoyaleScrollTop) {
+      askedAt = Date.now();
+      window.scrollTo(0, 0);
+      [60, 200, 450, 800].forEach(function (t) { setTimeout(function () { window.scrollTo(0, 0); }, t); });
+    }
   });
 })();
 </script>
